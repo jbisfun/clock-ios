@@ -1,0 +1,57 @@
+# Fossify Clock for iOS. Build with `idl build -c release` (see README.md).
+toolchain:
+  sdk_bundle: ~/.swiftpm/swift-sdks/darwin.artifactbundle
+  swiftly_bin: ~/.local/share/swiftly/bin
+  swiftc: swiftc
+  ldid: ldid
+  actool: idl-actool
+
+targets:
+  - name: FossifyClock
+    bundle_id: org.fossify.clock.ios
+    version: "1.6.0"
+    build_number: "1"
+    min_ios: "17.0"
+    device_family: "1,2"
+    link: [ClockKit, FossifyCommons]
+    sources: [App]
+    resources: [Resources/Assets.xcassets]
+    frameworks: [SwiftUI, UIKit, Foundation, UserNotifications, AVFoundation, AudioToolbox, ActivityKit]
+    ldflags: [-weak_framework, AlarmKit]
+    swift_version: "5.0"
+    info:
+      CFBundleDisplayName: Clock
+      NSAlarmKitUsageDescription: Clock rings your alarms and timers, even in silent mode.
+      UIApplicationSceneManifest:
+        UIApplicationSupportsMultipleScenes: false
+      UISupportedInterfaceOrientations:
+        - UIInterfaceOrientationPortrait
+        - UIInterfaceOrientationLandscapeLeft
+        - UIInterfaceOrientationLandscapeRight
+      UISupportedInterfaceOrientations~ipad:
+        - UIInterfaceOrientationPortrait
+        - UIInterfaceOrientationPortraitUpsideDown
+        - UIInterfaceOrientationLandscapeLeft
+        - UIInterfaceOrientationLandscapeRight
+    configurations:
+      debug:
+        entitlements:
+          get-task-allow: true
+
+  # Everything but the app entry point; also linked by the launcher (fossify-ios/launcher-ios).
+  - name: ClockKit
+    type: static
+    min_ios: "17.0"
+    link: [FossifyCommons]
+    sources: [Sources]
+    frameworks: [SwiftUI, UIKit, Foundation, UserNotifications, AVFoundation, AudioToolbox, ActivityKit]
+    swift_version: "5.0"
+
+  # Shared core (fossify-ios/commons-ios), compiled into the app as a static Swift module.
+  - name: FossifyCommons
+    type: static
+    dir: ../commons-ios
+    min_ios: "17.0"
+    sources: [Sources]
+    frameworks: [SwiftUI, UIKit, Foundation]
+    swift_version: "5.0"
